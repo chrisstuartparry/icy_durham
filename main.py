@@ -23,6 +23,10 @@ def main():
 
     plt.show()
 
+    data_filepath_root = "data/"
+
+    all_filepaths = glob(data_filepath_root)
+
 
 if __name__ == "__main__":
     main()
