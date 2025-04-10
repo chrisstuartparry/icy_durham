@@ -91,9 +91,11 @@ def main() -> None:
 
         plot_iv(current, voltage, field_value, angle_value)
 
+    save_filename = f"images/{str(angle_value)}angle.png"
+
     plt.legend()
     plt.tight_layout()
-    plt.savefig("images/all_iv_curves.png", dpi=100)
+    plt.savefig(save_filename, dpi=100)
     plt.show()
 
     print("Critical Currents:\n")
