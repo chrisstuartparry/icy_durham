@@ -40,19 +40,21 @@ def extract_values(data_filepath):
     return current, voltage, time, metadata
 
 
-def plot_iv(current, voltage, field_value, angle_value):
-    plt.plot(
+def plot_iv(current, voltage, field_value, angle_value, ic):
+    (iv_curve,) = plt.plot(
         current,
         voltage,
         linestyle="-",
         label=f"Angle {angle_value}° | Field {field_value} T",
     )
+    if ic:
+        plt.axhline(y=ic, linestyle="--", color=iv_curve.get_color())
     plt.xlabel("Current (A)")
     plt.ylabel("Voltage (uV)")
     return field_value, angle_value
 
 
-def find_critical_current(current, voltage, sample_length_m=2e-3, criterion_uvm=100):
+def find_critical_current(current, voltage, sample_length_m, criterion_uvm):
     # Convert voltage (µV) to electric field (µV/m)
     e_data = voltage / sample_length_m
     # Find where e_data crosses criterion_uvm
@@ -67,6 +69,62 @@ def find_critical_current(current, voltage, sample_length_m=2e-3, criterion_uvm=
     # Linear interpolation
     ic = np.interp(criterion_uvm, e_sorted, i_sorted)
     return ic
+
+
+def find_background_region(current, voltage, slope_threshold=0.2):
+    """
+    Returns (start_idx, end_idx) for the region over which dV/dI is
+    below slope_threshold, indicating mostly 'linear' background.
+
+    slope_threshold must be tuned to your data units—e.g. µV/A.
+    """
+    # Numerical derivative:
+    dVdI = np.gradient(voltage, current)
+
+    # We'll assume the background region starts at index = 0
+    # and continues as long as |dV/dI| < slope_threshold.
+    # Once slope exceeds threshold, we consider it the onset of exponential rise.
+    valid_mask = np.abs(dVdI) < slope_threshold
+
+    # Find the first index where the slope fails (goes above threshold)
+    # np.argmax returns the first True in ~valid_mask
+    first_fail = np.argmax(~valid_mask)
+
+    # If argmax finds no True in ~valid_mask (meaning all are valid),
+    # 'first_fail' might be 0 if the slope is never above threshold
+    # or it might be 0 if the very first point is invalid.
+
+    if first_fail == 0 and valid_mask[0] is False:
+        # Means the slope at the very first point is already above threshold
+        # => no real "background" region found
+        return 0, 0
+    if first_fail == 0 and valid_mask[0] is True:
+        # Means no slope ever exceeded threshold, entire dataset is "background"
+        return 0, len(voltage)
+
+    return 0, first_fail
+
+
+def remove_linear_background(current, voltage, slope_threshold=0.2):
+    """
+    1) Identify background region using derivative threshold
+    2) Fit a line only in that region
+    3) Subtract the fit from the entire voltage array
+
+    Returns (voltage_corrected, slope, intercept, bg_end_idx)
+    """
+    i_start, i_end = find_background_region(current, voltage, slope_threshold)
+
+    if i_end <= i_start:
+        # No valid region identified, just return original data
+        return voltage, None, None, (i_start, i_end)
+
+    # Fit a line to the 'background' portion
+    m, c = np.polyfit(current[i_start:i_end], voltage[i_start:i_end], 1)
+
+    # Subtract from the entire voltage array
+    voltage_corrected = voltage - (m * current + c)
+    return voltage_corrected, m, c, (i_start, i_end)
 
 
 def main() -> None:
@@ -84,12 +142,18 @@ def main() -> None:
         current, voltage, time, metadata = extract_values(data_filepath)
         field_value = float(metadata.get("field / T", "0"))
         angle_value = float(metadata.get("Angle (deg.)", "0"))
+        voltage_corrected, m, c, (bg_start, bg_end) = remove_linear_background(
+            current, voltage, slope_threshold=0.2
+        )
         ic = find_critical_current(
-            current, voltage, sample_length_m=2e-3, criterion_uvm=TRANSITION_CRITERION
+            current,
+            voltage_corrected,
+            sample_length_m=2e-3,
+            criterion_uvm=TRANSITION_CRITERION,
         )
         ic_values.append((field_value, angle_value, ic))
 
-        plot_iv(current, voltage, field_value, angle_value)
+        plot_iv(current, voltage_corrected, field_value, angle_value, ic)
 
     save_filename = f"images/{str(angle_value)}angle.png"
 
