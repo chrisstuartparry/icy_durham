@@ -11,4 +11,5 @@ dependencies = [
     "pandas-stubs>=2.2.3.241126",
     "pandas>=2.2.3",
     "scipy>=1.15.1",
+    "scipy-stubs>=1.15.2.2",
 ]

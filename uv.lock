@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.13.1"
 
 [[package]]
@@ -69,6 +70,7 @@ dependencies = [
     { name = "pandas" },
     { name = "pandas-stubs" },
     { name = "scipy" },
+    { name = "scipy-stubs" },
 ]
 
 [package.metadata]
@@ -79,6 +81,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.2.3" },
     { name = "pandas-stubs", specifier = ">=2.2.3.241126" },
     { name = "scipy", specifier = ">=1.15.1" },
+    { name = "scipy-stubs", specifier = ">=1.15.2.2" },
 ]
 
 [[package]]
@@ -202,6 +205,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/aa/29/14a177f1a90b8ad8a592ca32124ac06af5eff32889874e53a308f850290f/numpy-2.2.2-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:106397dbbb1896f99e044efc90360d098b3335060375c26aa89c0d8a97c5f648", size = 17856316 },
     { url = "https://files.pythonhosted.org/packages/95/03/242ae8d7b97f4e0e4ab8dd51231465fb23ed5e802680d629149722e3faf1/numpy-2.2.2-cp313-cp313t-win32.whl", hash = "sha256:0eec19f8af947a61e968d5429f0bd92fec46d92b0008d0a6685b40d6adf8a4f4", size = 6329134 },
     { url = "https://files.pythonhosted.org/packages/80/94/cd9e9b04012c015cb6320ab3bf43bc615e248dddfeb163728e800a5d96f0/numpy-2.2.2-cp313-cp313t-win_amd64.whl", hash = "sha256:97b974d3ba0fb4612b77ed35d7627490e8e3dff56ab41454d9e8b23448940576", size = 12696208 },
+]
+
+[[package]]
+name = "optype"
+version = "0.9.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/88/3c/9d59b0167458b839273ad0c4fc5f62f787058d8f5aed7f71294963a99471/optype-0.9.3.tar.gz", hash = "sha256:5f09d74127d316053b26971ce441a4df01f3a01943601d3712dd6f34cdfbaf48", size = 96143 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/73/d8/ac50e2982bdc2d3595dc2bfe3c7e5a0574b5e407ad82d70b5f3707009671/optype-0.9.3-py3-none-any.whl", hash = "sha256:2935c033265938d66cc4198b0aca865572e635094e60e6e79522852f029d9e8d", size = 84357 },
 ]
 
 [[package]]
@@ -334,6 +346,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/84/9d/8f539002b5e203723af6a6f513a45e0a7671e9dabeedb08f417ac17e4edc/scipy-1.15.1-cp313-cp313t-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f735bc41bd1c792c96bc426dece66c8723283695f02df61dcc4d0a707a42fc54", size = 39883261 },
     { url = "https://files.pythonhosted.org/packages/97/c0/62fd3bab828bcccc9b864c5997645a3b86372a35941cdaf677565c25c98d/scipy-1.15.1-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:2722a021a7929d21168830790202a75dbb20b468a8133c74a2c0230c72626b6c", size = 42093299 },
     { url = "https://files.pythonhosted.org/packages/e4/1f/5d46a8d94e9f6d2c913cbb109e57e7eed914de38ea99e2c4d69a9fc93140/scipy-1.15.1-cp313-cp313t-win_amd64.whl", hash = "sha256:bc7136626261ac1ed988dca56cfc4ab5180f75e0ee52e58f1e6aa74b5f3eacd5", size = 43181730 },
+]
+
+[[package]]
+name = "scipy-stubs"
+version = "1.15.2.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "optype" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/61/ee/0c3e93545b53d3b22e662fbe251c3e61c2b14742f296f36708eff4a2898c/scipy_stubs-1.15.2.2.tar.gz", hash = "sha256:0137d907d75381d2eda4f6af5b1d3211759cb193a0eadf5195716fb0b01ca3cb", size = 275755 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2b/1a/3eba813584e398d589e1d4e0dac0cf822ce9e25b28cb2d1f0012d137c968/scipy_stubs-1.15.2.2-py3-none-any.whl", hash = "sha256:f02fe66124b58bce5f0897ecd48d0e79226a999cc4e6984a9472520c20b8e4b6", size = 459133 },
 ]
 
 [[package]]
