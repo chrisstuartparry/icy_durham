@@ -170,6 +170,7 @@ def find_background_region_adaptive(
 def find_background_region_robust(
     current,
     voltage,
+    skip_first_n,
     slope_threshold=None,
     min_region_size=10,
     smooth=True,
@@ -185,6 +186,7 @@ def find_background_region_robust(
     4. Can use either a fixed slope_threshold or derive it from data percentile
 
     Parameters:
+    - skip_first_n: Number of points to skip at the start of the arrays
     - slope_threshold: Fixed threshold for slope. If None, uses percentile method
     - min_region_size: Minimum number of points required for a valid background region
     - smooth: Whether to smooth the voltage data
@@ -201,8 +203,12 @@ def find_background_region_robust(
     else:
         voltage_smoothed = voltage
 
+    current_subset = current[skip_first_n:]
+    voltage_subset = voltage_smoothed[skip_first_n:]
+
     # Numerical derivative:
-    dVdI = np.gradient(voltage_smoothed, current)
+    # dVdI = np.gradient(voltage_smoothed, current)
+    dVdI = np.gradient(voltage_subset, current_subset)
     abs_dVdI = np.abs(dVdI)
 
     # Determine threshold
@@ -251,8 +257,10 @@ def find_background_region_robust(
     # Find the longest segment
     longest_segment = max(valid_segments, key=len)
 
-    bg_start = longest_segment[0]
-    bg_end = longest_segment[-1] + 1  # +1 because Python slicing is exclusive of end
+    bg_start = longest_segment[0] + skip_first_n
+    bg_end = (
+        longest_segment[-1] + 1 + skip_first_n
+    )  # +1 because Python slicing is exclusive of end
 
     print(
         f"Found background region from index {bg_start} to {bg_end} ({bg_end-bg_start} points)"
@@ -339,7 +347,7 @@ def remove_linear_background_improved(current, voltage, method="robust", **kwarg
 
     elif method == "robust":
         voltage_smoothed, i_start, i_end = find_background_region_robust(
-            current, voltage, **kwargs
+            current, voltage, skip_first_n=10, **kwargs
         )
 
     else:
@@ -547,7 +555,8 @@ def diagnose_dataset(current, voltage, time=None, dataset_name=""):
     import numpy as np
 
     print(f"\n=== DIAGNOSING DATASET: {dataset_name} ===")
-
+    print(f"With first 10 currents of: {current[:10]}")
+    print(f"With first 10 voltages of: {voltage[:10]}")
     # Check for NaN or infinite values
     print(f"NaN in current: {np.isnan(current).any()}")
     print(f"NaN in voltage: {np.isnan(voltage).any()}")
